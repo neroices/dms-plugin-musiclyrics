@@ -1,18 +1,23 @@
-# Music Lyrics
+# Music Lyrics (Fork)
 
-![](screenshots.png)
+![](screenshots/1.png)
 
+<p align="center">
+<img src="screenshots/2.png" alt="screenshot 2" />
+</p>
+    
 A DankMaterialShell widget plugin that displays synced music lyrics from multiple sources right on your panel.
 
 ## Features
 * **Live Lyrics:** Shows real-time synced lyrics on the panel bar.
 * **Smart Fetching:** Retrieves lyrics from your local cache, Navidrome, Musixmatch, or lrclib.net.
 * **Media Player Management:** Click the widget to open a popout menu where you can view lyric fetch statuses and switch between active MPRIS media players.
+* **Application Filtering:** Block specific applications from displaying lyrics on the panel bar.
 
 ## Installation
 1. Clone this repo directly to your DankMaterialShell plugins directory:
    ```bash
-   git clone https://github.com/Gasiyu/dms-plugin-musiclyrics ~/.config/DankMaterialShell/plugins/musiclyrics
+   git clone https://github.com/neroices/dms-plugin-musiclyrics ~/.config/DankMaterialShell/plugins/musiclyrics
    ```
 2. Open DMS Settings → Plugins, click "Scan", and toggle "Music Lyrics" on.
 3. Add the plugin to your DankBar widget list.
