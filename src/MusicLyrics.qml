@@ -1167,40 +1167,123 @@ PluginComponent {
                                     spacing: 2
                                     visible: root.activePlayer
 
+                                    // Artist Row
                                     Row {
+                                        id: artistRow
                                         spacing: Theme.spacingXS
+                                        width: parent.width
+
                                         DankIcon {
+                                            id: artistIcon
                                             name: "person"
                                             size: 14
                                             color: Theme.surfaceVariantText
                                             anchors.verticalCenter: parent.verticalCenter
                                         }
-                                        StyledText {
-                                            text: root.currentArtist || "Unknown Artist"
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            color: Theme.surfaceText
+
+                                        // Text container that trims and limits the visible window
+                                        Item {
+                                            height: artistText.implicitHeight
+                                            // Subtract the icon size and row spacing from the total row width
+                                            width: parent.width - artistIcon.size - parent.spacing
                                             anchors.verticalCenter: parent.verticalCenter
-                                            maximumLineCount: 1
-                                            elide: Text.ElideRight
+                                            clip: true // Critical: Crops any text outside this boundary
+
+                                            StyledText {
+                                                id: artistText
+                                                text: root.currentArtist || "Unknown Artist"
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                color: Theme.surfaceText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                maximumLineCount: 1
+                                                elide: Text.ElideNone // Disable eliding so text can scroll out complete
+
+                                                // Adjust X coordinate dynamically based on animation state
+                                                x: implicitWidth > parent.width ? artistMarquee.currentX : 0
+
+                                                SequentialAnimation {
+                                                    id: artistMarquee
+                                                    loops: Animation.Infinite
+                                                    running: artistText.implicitWidth > artistText.parent.width
+
+                                                    property real currentX: 0
+
+                                                    PauseAnimation { duration: 2500 } // Wait at the beginning
+                                                    NumberAnimation {
+                                                        target: artistMarquee
+                                                        property: "currentX"
+                                                        from: 0
+                                                        to: -(artistText.implicitWidth - artistText.parent.width)
+                                                        duration: Math.max(2000, (artistText.implicitWidth - artistText.parent.width) * 30)
+                                                        easing.type: Easing.Linear
+                                                    }
+                                                    PauseAnimation { duration: 2000 } // Wait at the end
+                                                    NumberAnimation { target: artistMarquee; property: "currentX"; to: 0; duration: 0 } // Snap back
+                                                }
+
+                                                // Stop/Reset animation if song change results in shorter string
+                                                onTextChanged: artistMarquee.stop()
+                                            }
                                         }
                                     }
 
+                                    // Album Row
                                     Row {
+                                        id: albumRow
                                         spacing: Theme.spacingXS
+                                        width: parent.width
                                         visible: root.currentAlbum !== ""
+
                                         DankIcon {
+                                            id: albumIcon
                                             name: "album"
                                             size: 14
                                             color: Theme.surfaceVariantText
                                             anchors.verticalCenter: parent.verticalCenter
                                         }
-                                        StyledText {
-                                            text: root.currentAlbum
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            color: Theme.surfaceVariantText
+
+                                        Item {
+                                            height: albumText.implicitHeight
+                                            // Subtract the icon size and row spacing from the total row width
+                                            width: parent.width - albumIcon.size - parent.spacing
                                             anchors.verticalCenter: parent.verticalCenter
-                                            maximumLineCount: 1
-                                            elide: Text.ElideRight
+                                            clip: true
+
+                                            StyledText {
+                                                id: albumText
+                                                text: root.currentAlbum
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                maximumLineCount: 1
+                                                elide: Text.ElideNone
+
+                                                // Adjust X coordinate dynamically based on animation state
+                                                x: implicitWidth > parent.width ? albumMarquee.currentX : 0
+
+                                                SequentialAnimation {
+                                                    id: albumMarquee
+                                                    loops: Animation.Infinite
+                                                    running: albumText.implicitWidth > albumText.parent.width
+
+                                                    property real currentX: 0
+
+                                                    PauseAnimation { duration: 2500 } // Wait at the beginning
+                                                    NumberAnimation {
+                                                        target: albumMarquee
+                                                        property: "currentX"
+                                                        from: 0
+                                                        to: -(albumText.implicitWidth - albumText.parent.width)
+                                                        duration: Math.max(2000, (albumText.implicitWidth - albumText.parent.width) * 30)
+                                                        easing.type: Easing.Linear
+                                                    }
+                                                    PauseAnimation { duration: 2000 } // Wait at the end
+                                                    NumberAnimation { target: albumMarquee; property: "currentX"; to: 0; duration: 0 } // Snap back
+                                                }
+
+                                                // Stop/Reset animation if song change results in shorter string
+                                                onTextChanged: albumMarquee.stop()
+                                            }
                                         }
                                     }
                                 }
@@ -1284,39 +1367,91 @@ PluginComponent {
 
                                     // Previous Button
                                     MouseArea {
-                                        width: 32; height: 32
+                                        id: prevArea
+                                        width: 36; height: 36
                                         cursorShape: Qt.PointingHandCursor
+                                        hoverEnabled: true
                                         onClicked: if (root.activePlayer) root.activePlayer.previous()
+
+                                        // Circular background pill
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: width / 2
+                                            // Becomes visible/tinted on hover or press
+                                            color: prevArea.pressed
+                                                   ? Theme.withAlpha(Theme.primary, 0.2)
+                                                   : (prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.1) : "transparent")
+
+                                            // Optional subtle border so it doesn't vanish completely if transparent
+                                            border.color: prevArea.containsMouse ? "transparent" : Theme.withAlpha(Theme.surfaceVariantText, 0.2)
+                                            border.width: 1
+                                        }
+
                                         DankIcon {
                                             name: "skip_previous"
-                                            size: 24
-                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            size: 22
+                                            color: prevArea.pressed ? Theme.primary : Theme.surfaceText
                                             anchors.centerIn: parent
                                         }
                                     }
 
-                                    // Play / Pause Button
+                                    // Play / Pause Button (Hero Accent)
                                     MouseArea {
-                                        width: 32; height: 32
+                                        id: playArea
+                                        width: 40; height: 40 // Slightly bigger center button
                                         cursorShape: Qt.PointingHandCursor
+                                        hoverEnabled: true
                                         onClicked: if (root.activePlayer) root.activePlayer.togglePlaying()
+
+                                        // Circular background pill
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: width / 2
+                                            // Uses your primary theme color as a tinted backing base
+                                            color: playArea.pressed
+                                                   ? Theme.withAlpha(Theme.primary, 0.3)
+                                                   : (playArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.15) : Theme.withAlpha(Theme.primary, 0.08))
+
+                                            border.color: Theme.withAlpha(Theme.primary, 0.3)
+                                            border.width: 1
+                                        }
+
                                         DankIcon {
-                                            name: root.activePlayer && root.activePlayer.playbackState === MprisPlaybackState.Playing ? "pause_circle_filled" : "play_circle_filled"
-                                            size: 28
-                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            // Evaluates playback state properly to switch visual shapes
+                                            name: root.activePlayer && root.activePlayer.playbackState === MprisPlaybackState.Playing
+                                                  ? "pause"
+                                                  : "play_arrow"
+                                            size: 24
+                                            // Always forces your theme's Primary accent color so it stays completely visible when paused
+                                            color: Theme.primary
                                             anchors.centerIn: parent
                                         }
                                     }
 
                                     // Next Button
                                     MouseArea {
-                                        width: 32; height: 32
+                                        id: nextArea
+                                        width: 36; height: 36
                                         cursorShape: Qt.PointingHandCursor
+                                        hoverEnabled: true
                                         onClicked: if (root.activePlayer) root.activePlayer.next()
+
+                                        // Circular background pill
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: width / 2
+                                            color: nextArea.pressed
+                                                   ? Theme.withAlpha(Theme.primary, 0.2)
+                                                   : (nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceText, 0.1) : "transparent")
+
+                                            border.color: nextArea.containsMouse ? "transparent" : Theme.withAlpha(Theme.surfaceVariantText, 0.2)
+                                            border.width: 1
+                                        }
+
                                         DankIcon {
                                             name: "skip_next"
-                                            size: 24
-                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            size: 22
+                                            color: nextArea.pressed ? Theme.primary : Theme.surfaceText
                                             anchors.centerIn: parent
                                         }
                                     }
