@@ -173,7 +173,7 @@ PluginComponent {
         repeat: false
         property var onTimeout: null
         onTriggered: if (onTimeout)
-            onTimeout()
+                         onTimeout()
     }
 
     // Static one-shot timer for retry delays
@@ -182,7 +182,7 @@ PluginComponent {
         repeat: false
         property var onRetry: null
         onTriggered: if (onRetry)
-            onRetry()
+                         onRetry()
     }
 
     // Cache directory creation
@@ -225,9 +225,9 @@ PluginComponent {
 
     function readFromCache(title, artist, callback) {
         cacheReaderComponent.createObject(root, {
-            path: _cacheFilePath(title, artist),
-            callback: callback
-        });
+                                              path: _cacheFilePath(title, artist),
+                                              callback: callback
+                                          });
     }
 
     // Cache write using FileView
@@ -252,14 +252,14 @@ PluginComponent {
     function writeToCache(title, artist, lines, source) {
         _ensureCacheDir();
         var writer = cacheWriterComponent.createObject(root, {
-            path: _cacheFilePath(title, artist),
-            cTitle: title,
-            cArtist: artist
-        });
+                                                           path: _cacheFilePath(title, artist),
+                                                           cTitle: title,
+                                                           cArtist: artist
+                                                       });
         writer.setText(JSON.stringify({
-            lines: lines,
-            source: source
-        }));
+                                          lines: lines,
+                                          source: source
+                                      }));
     }
 
     // -------------------------------------------------------------------------
@@ -622,9 +622,9 @@ PluginComponent {
         }
 
         var url = "https://apic-desktop.musixmatch.com/ws/1.1/token.get"
-            + "?user_language=en"
-            + "&app_id=web-desktop-app-v1.0"
-            + "&t=" + Date.now();
+                + "?user_language=en"
+                + "&app_id=web-desktop-app-v1.0"
+                + "&t=" + Date.now();
 
         console.info("[MusicLyrics] Musixmatch: fetching token…");
 
@@ -674,12 +674,12 @@ PluginComponent {
                 return;
 
             var trackUrl = "https://apic-desktop.musixmatch.com/ws/1.1/matcher.track.get"
-                + "?q_track=" + encodeURIComponent(expectedTitle)
-                + "&q_artist=" + encodeURIComponent(expectedArtist)
-                + "&page_size=1&page=1"
-                + "&app_id=web-desktop-app-v1.0"
-                + "&usertoken=" + encodeURIComponent(token)
-                + "&t=" + Date.now();
+                    + "?q_track=" + encodeURIComponent(expectedTitle)
+                    + "&q_artist=" + encodeURIComponent(expectedArtist)
+                    + "&page_size=1&page=1"
+                    + "&app_id=web-desktop-app-v1.0"
+                    + "&usertoken=" + encodeURIComponent(token)
+                    + "&t=" + Date.now();
 
             root._cancelActiveFetch = root._xhrGet(trackUrl, 15000, function (responseText, httpStatus) {
                 try {
@@ -730,11 +730,11 @@ PluginComponent {
 
     function _fetchMusixmatchLyrics(trackId, token, expectedTitle, expectedArtist, _tokenRetried) {
         var url = "https://apic-desktop.musixmatch.com/ws/1.1/track.subtitle.get"
-            + "?track_id=" + trackId
-            + "&subtitle_format=lrc"
-            + "&app_id=web-desktop-app-v1.0"
-            + "&usertoken=" + encodeURIComponent(token)
-            + "&t=" + Date.now();
+                + "?track_id=" + trackId
+                + "&subtitle_format=lrc"
+                + "&app_id=web-desktop-app-v1.0"
+                + "&usertoken=" + encodeURIComponent(token)
+                + "&t=" + Date.now();
 
         root._cancelActiveFetch = _xhrGet(url, 15000, function (responseText, httpStatus) {
             // Guard: track may have changed
@@ -806,9 +806,9 @@ PluginComponent {
             if (match[3].length === 2)
                 millis *= 10;
             acc.push({
-                time: parseInt(match[1]) * 60 + parseInt(match[2]) + millis / 1000,
-                text: line.replace(/\[\d{2}:\d{2}\.\d{2,3}\]/g, "").trim()
-            });
+                         time: parseInt(match[1]) * 60 + parseInt(match[2]) + millis / 1000,
+                         text: line.replace(/\[\d{2}:\d{2}\.\d{2,3}\]/g, "").trim()
+                     });
             return acc;
         }, []);
         result.sort(function (a, b) {
@@ -845,57 +845,57 @@ PluginComponent {
     // -------------------------------------------------------------------------
 
     readonly property var _chipMeta: ({
-            [status.searching]: {
-                color: Theme.secondary,
-                icon: "hourglass_top",
-                label: "Searching…"
-            },
-            [status.found]: {
-                color: Theme.primary,
-                icon: "check_circle",
-                label: "Found — Synced lyrics"
-            },
-            [status.notFound]: {
-                color: Theme.warning,
-                icon: "cancel",
-                label: "Not found"
-            },
-            [status.error]: {
-                color: Theme.error,
-                icon: "error",
-                label: "Error"
-            },
-            [status.skippedConfig]: {
-                color: Theme.warning,
-                icon: "block",
-                label: "Skipped — Not configured"
-            },
-            [status.skippedFound]: {
-                color: Theme.warning,
-                icon: "block",
-                label: "Skipped — Already found"
-            },
-            [status.skippedPlain]: {
-                color: Theme.warning,
-                icon: "block",
-                label: "Skipped — Plain lyrics only"
-            },
-            [status.cacheHit]: {
-                color: Theme.primary,
-                icon: "check_circle",
-                label: "Hit — Lyrics loaded from cache"
-            },
-            [status.cacheMiss]: {
-                color: Theme.warning,
-                icon: "cancel",
-                label: "Miss — Not in cache"
-            },
-            [status.cacheDisabled]: {
-                color: Theme.surfaceVariantText,
-                icon: "do_not_disturb_on",
-                label: "Disabled"
-            }
-        })
+                                          [status.searching]: {
+                                              color: Theme.secondary,
+                                              icon: "hourglass_top",
+                                              label: "Searching…"
+                                          },
+                                          [status.found]: {
+                                              color: Theme.primary,
+                                              icon: "check_circle",
+                                              label: "Found — Synced lyrics"
+                                          },
+                                          [status.notFound]: {
+                                              color: Theme.warning,
+                                              icon: "cancel",
+                                              label: "Not found"
+                                          },
+                                          [status.error]: {
+                                              color: Theme.error,
+                                              icon: "error",
+                                              label: "Error"
+                                          },
+                                          [status.skippedConfig]: {
+                                              color: Theme.warning,
+                                              icon: "block",
+                                              label: "Skipped — Not configured"
+                                          },
+                                          [status.skippedFound]: {
+                                              color: Theme.warning,
+                                              icon: "block",
+                                              label: "Skipped — Already found"
+                                          },
+                                          [status.skippedPlain]: {
+                                              color: Theme.warning,
+                                              icon: "block",
+                                              label: "Skipped — Plain lyrics only"
+                                          },
+                                          [status.cacheHit]: {
+                                              color: Theme.primary,
+                                              icon: "check_circle",
+                                              label: "Hit — Lyrics loaded from cache"
+                                          },
+                                          [status.cacheMiss]: {
+                                              color: Theme.warning,
+                                              icon: "cancel",
+                                              label: "Miss — Not in cache"
+                                          },
+                                          [status.cacheDisabled]: {
+                                              color: Theme.surfaceVariantText,
+                                              icon: "do_not_disturb_on",
+                                              label: "Disabled"
+                                          }
+                                      })
 
     function _chip(val) {
         return _chipMeta[val] ?? {
@@ -926,6 +926,7 @@ PluginComponent {
         Row {
             spacing: Theme.spacingS
 
+            // Simple pill containing only the context icon
             Rectangle {
                 width: chipContent.implicitWidth + Theme.spacingS * 2
                 height: Theme.fontSizeSmall + Theme.spacingXS
@@ -944,19 +945,10 @@ PluginComponent {
                         size: Theme.fontSizeSmall
                         color: Theme.background
                     }
-
-                    StyledText {
-                        text: root.lyricSource === lyricSrc.navidrome ? "Navidrome" : root.lyricSource === lyricSrc.lrclib ? "lrclib" : root.lyricSource === lyricSrc.musixmatch ? "Musixmatch" : ""
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.background
-                        anchors.verticalCenter: parent.verticalCenter
-                        maximumLineCount: 1
-                        elide: Text.ElideRight
-                        visible: root.lyricsLines.length > 0
-                    }
                 }
             }
 
+            // Lyric Text — Fixed cropping by removing the restrictive 'width: Math.min(implicitWidth, 300)'
             StyledText {
                 text: root.currentLyricText
                 font.pixelSize: Theme.fontSizeSmall
@@ -964,7 +956,6 @@ PluginComponent {
                 anchors.verticalCenter: parent.verticalCenter
                 maximumLineCount: 1
                 elide: Text.ElideRight
-                width: Math.min(implicitWidth, 300)
             }
         }
     }
@@ -1022,8 +1013,8 @@ PluginComponent {
                         height: nowPlayingContent.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
                         color: root.activePlayer
-                              ? Theme.withAlpha(Theme.primary, 0.08)
-                              : Theme.withAlpha(Theme.surfaceContainerHighest, 0.5)
+                               ? Theme.withAlpha(Theme.primary, 0.08)
+                               : Theme.withAlpha(Theme.surfaceContainerHighest, 0.5)
 
                         Row {
                             id: nowPlayingContent
