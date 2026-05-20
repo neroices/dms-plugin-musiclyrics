@@ -14,9 +14,54 @@ PluginComponent {
     property string navidromeUser: pluginData.navidromeUser ?? ""
     property string navidromePassword: pluginData.navidromePassword ?? ""
     property bool cachingEnabled: pluginData.cachingEnabled ?? true
+    property string ignoredPlayers: pluginData.ignoredPlayers ?? "firefox,zen,chromium,chrome,brave,edge"
 
-    readonly property MprisPlayer activePlayer: MprisController.activePlayer
     property var allPlayers: MprisController.availablePlayers
+
+    function _ignoredPlayerList() {
+        return ignoredPlayers
+        .toLowerCase()
+        .split(",")
+        .map(function(item) {
+            return item.trim();
+        })
+        .filter(function(item) {
+            return item.length > 0;
+        });
+    }
+
+    function _isIgnoredPlayer(player) {
+        if (!player)
+            return true;
+
+        const ignored = _ignoredPlayerList();
+        const identity = (player.identity || "").toLowerCase();
+        const dbusName = (player.dbusName || "").toLowerCase();
+        const desktopEntry = (player.desktopEntry || "").toLowerCase();
+
+        for (let i = 0; i < ignored.length; ++i) {
+            const keyword = ignored[i];
+
+            if (identity.indexOf(keyword) !== -1
+                    || dbusName.indexOf(keyword) !== -1
+                    || desktopEntry.indexOf(keyword) !== -1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    readonly property MprisPlayer activePlayer: {
+        for (let i = 0; i < allPlayers.length; ++i) {
+            const player = allPlayers[i];
+
+            if (!_isIgnoredPlayer(player))
+                return player;
+        }
+
+        return null;
+    }
 
     // -------------------------------------------------------------------------
     // Enum namespaces
