@@ -916,58 +916,49 @@ PluginComponent {
     }
 
     // -------------------------------------------------------------------------
-    // Bar Pills: show current lyric line
-    // -------------------------------------------------------------------------
+        // Bar Pills: show current lyric line
+        // -------------------------------------------------------------------------
 
-    horizontalBarPill: root.activePlayer ? hPillComponent : null
+        horizontalBarPill: root.activePlayer ? hPillComponent : null
 
-    Component {
-        id: hPillComponent
-        Row {
-            spacing: Theme.spacingS
+        Component {
+            id: hPillComponent
+            Row {
+                spacing: Theme.spacingS
 
-            Rectangle {
-                width: chipContent.implicitWidth + Theme.spacingS * 2
-                height: Theme.fontSizeSmall + Theme.spacingXS
-                radius: 12
-                anchors.verticalCenter: parent.verticalCenter
-                color: Theme.primary
+                // Simple pill containing only the context icon
+                Rectangle {
+                    width: chipContent.implicitWidth + Theme.spacingS * 2
+                    height: Theme.fontSizeSmall + Theme.spacingXS
+                    radius: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.primary
 
-                Row {
-                    id: chipContent
-                    anchors.centerIn: parent
-                    spacing: Theme.spacingXS
+                    Row {
+                        id: chipContent
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
 
-                    DankIcon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing ? "lyrics" : "pause"
-                        size: Theme.fontSizeSmall
-                        color: Theme.background
-                    }
-
-                    StyledText {
-                        text: root.lyricSource === lyricSrc.navidrome ? "Navidrome" : root.lyricSource === lyricSrc.lrclib ? "lrclib" : root.lyricSource === lyricSrc.musixmatch ? "Musixmatch" : ""
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.background
-                        anchors.verticalCenter: parent.verticalCenter
-                        maximumLineCount: 1
-                        elide: Text.ElideRight
-                        visible: root.lyricsLines.length > 0
+                        DankIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing ? "lyrics" : "pause"
+                            size: Theme.fontSizeSmall
+                            color: Theme.background
+                        }
                     }
                 }
-            }
 
-            StyledText {
-                text: root.currentLyricText
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                anchors.verticalCenter: parent.verticalCenter
-                maximumLineCount: 1
-                elide: Text.ElideRight
-                width: Math.min(implicitWidth, 300)
+                // Lyric Text — Fixed cropping by removing the restrictive 'width: Math.min(implicitWidth, 300)'
+                StyledText {
+                    text: root.currentLyricText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                    maximumLineCount: 1
+                    elide: Text.ElideRight
+                }
             }
         }
-    }
 
     verticalBarPill: root.activePlayer ? vPillComponent : null
 
