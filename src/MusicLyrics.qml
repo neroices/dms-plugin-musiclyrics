@@ -33,7 +33,6 @@ PluginComponent {
     function _isIgnoredPlayer(player) {
         if (!player)
             return true;
-
         const ignored = _ignoredPlayerList();
         const identity = (player.identity || "").toLowerCase();
         const dbusName = (player.dbusName || "").toLowerCase();
@@ -41,7 +40,6 @@ PluginComponent {
 
         for (let i = 0; i < ignored.length; ++i) {
             const keyword = ignored[i];
-
             if (identity.indexOf(keyword) !== -1
                     || dbusName.indexOf(keyword) !== -1
                     || desktopEntry.indexOf(keyword) !== -1) {
@@ -55,7 +53,6 @@ PluginComponent {
     readonly property MprisPlayer activePlayer: {
         for (let i = 0; i < allPlayers.length; ++i) {
             const player = allPlayers[i];
-
             if (!_isIgnoredPlayer(player))
                 return player;
         }
@@ -316,7 +313,6 @@ PluginComponent {
             return;
         if (currentTitle === _lastFetchedTrack && currentArtist === _lastFetchedArtist)
             return;
-
         // Cancel any in-flight XHR before starting fresh
         if (_cancelActiveFetch) {
             _cancelActiveFetch();
@@ -326,10 +322,8 @@ PluginComponent {
         _lastFetchedTrack = currentTitle;
         _lastFetchedArtist = currentArtist;
         _resetLyricsState();
-
         var durationStr = currentDuration > 0 ? (Math.floor(currentDuration / 60) + ":" + ("0" + Math.floor(currentDuration % 60)).slice(-2)) : "unknown";
         console.info("[MusicLyrics] ▶ Track changed: \"" + currentTitle + "\" by " + currentArtist + (currentAlbum ? " [" + currentAlbum + "]" : "") + " (" + durationStr + ")");
-
         var capturedTitle = currentTitle;
         var capturedArtist = currentArtist;
 
@@ -378,7 +372,6 @@ PluginComponent {
         var attempt = 0;
         var cancelled = false;
         var currentXhr = null;
-
         function _attempt() {
             attempt++;
             currentXhr = new XMLHttpRequest();
@@ -394,7 +387,6 @@ PluginComponent {
                 }
             };
             xhrTimeoutTimer.start();
-
             currentXhr.onreadystatechange = function () {
                 if (currentXhr.readyState !== XMLHttpRequest.DONE || done || cancelled)
                     return;
@@ -438,7 +430,6 @@ PluginComponent {
         }
 
         _attempt();
-
         // Return a cancel function the caller can invoke to abort the entire chain
         return function cancel() {
             cancelled = true;
@@ -458,16 +449,15 @@ PluginComponent {
     function _navidromeUrl(endpoint, extraParams) {
         var base = navidromeUrl.replace(/\/+$/, "") + "/rest/" + endpoint;
         var auth = "u=" + encodeURIComponent(navidromeUser) + "&p=" + encodeURIComponent(navidromePassword) + "&v=1.16.1&c=DankMaterialShell&f=json";
-        return base + "?" + (extraParams ? extraParams + "&" : "") + auth;
+        return base + "?"
+                + (extraParams ? extraParams + "&" : "") + auth;
     }
 
     function _fetchFromNavidrome(expectedTitle, expectedArtist) {
         navidromeStatus = status.searching;
         console.info("[MusicLyrics] Navidrome: searching for \"" + expectedTitle + "\" by " + expectedArtist);
-
         var searchUrl = _navidromeUrl("search3", "query=" + encodeURIComponent(expectedTitle) + "&songCount=5&albumCount=0&artistCount=0");
         console.log("[MusicLyrics] Navidrome: search URL = " + searchUrl);
-
         root._cancelActiveFetch = _xhrGet(searchUrl, 15000, function (responseText, httpStatus) {
             var rawData = (responseText || "").trim();
             console.log("[MusicLyrics] Navidrome: search response length = " + rawData.length);
@@ -597,13 +587,11 @@ PluginComponent {
 
         lrclibStatus = status.searching;
         console.info("[MusicLyrics] lrclib: searching for \"" + expectedTitle + "\" by " + expectedArtist);
-
         var url = "https://lrclib.net/api/get?artist_name=" + encodeURIComponent(expectedArtist) + "&track_name=" + encodeURIComponent(expectedTitle);
         if (currentAlbum)
             url += "&album_name=" + encodeURIComponent(currentAlbum);
         if (currentDuration > 0)
             url += "&duration=" + Math.round(currentDuration);
-
         root._cancelActiveFetch = _xhrGet(url, 20000, function (responseText, httpStatus) {
             var rawData = (responseText || "").trim();
             console.log("[MusicLyrics] lrclib: response length = " + rawData.length);
@@ -706,7 +694,6 @@ PluginComponent {
 
         musixmatchStatus = status.searching;
         console.info("[MusicLyrics] Musixmatch: searching for \"" + expectedTitle + "\" by " + expectedArtist);
-
         _fetchMusixmatchToken(function (token) {
             if (!token) {
                 root._setMusixmatchNotFound(status.error);
@@ -753,7 +740,6 @@ PluginComponent {
                     var hasSubtitles = track.has_subtitles === 1;
                     var hasLyrics = track.has_lyrics === 1;
                     console.info("[MusicLyrics] Musixmatch: track matched (id: " + trackId + ", has_subtitles: " + hasSubtitles + ", has_lyrics: " + hasLyrics + ")");
-
                     if (!hasSubtitles) {
                         root._setMusixmatchNotFound(hasLyrics ? status.skippedPlain : status.notFound);
                         console.info("[MusicLyrics] ✗ Musixmatch: track has no synced lyrics (has_subtitles=0) for \"" + expectedTitle + "\"");
@@ -943,7 +929,8 @@ PluginComponent {
                                       })
 
     function _chip(val) {
-        return _chipMeta[val] ?? {
+        return _chipMeta[val] ??
+                {
             color: Theme.surfaceContainerHighest,
             icon: "radio_button_unchecked",
             label: "Idle"
@@ -1286,6 +1273,54 @@ PluginComponent {
                                         }
                                     }
                                 }
+
+                                // ── Media Controls Row ──
+                                Row {
+                                    id: mediaControls
+                                    visible: root.activePlayer !== null
+                                    spacing: Theme.spacingM
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    topPadding: Theme.spacingS
+
+                                    // Previous Button
+                                    MouseArea {
+                                        width: 32; height: 32
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: if (root.activePlayer) root.activePlayer.previous()
+                                        DankIcon {
+                                            name: "skip_previous"
+                                            size: 24
+                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+
+                                    // Play / Pause Button
+                                    MouseArea {
+                                        width: 32; height: 32
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: if (root.activePlayer) root.activePlayer.togglePlaying()
+                                        DankIcon {
+                                            name: root.activePlayer && root.activePlayer.playbackState === MprisPlaybackState.Playing ? "pause_circle_filled" : "play_circle_filled"
+                                            size: 28
+                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+
+                                    // Next Button
+                                    MouseArea {
+                                        width: 32; height: 32
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: if (root.activePlayer) root.activePlayer.next()
+                                        DankIcon {
+                                            name: "skip_next"
+                                            size: 24
+                                            color: parent.pressed ? Theme.primary : Theme.surfaceText
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+                                }
                             }
 
                             // Album cover art
@@ -1458,7 +1493,7 @@ PluginComponent {
     }
 
     popoutWidth: 380
-    popoutHeight: 520
+    popoutHeight: 550
 
     Component.onCompleted: {
         console.info("[MusicLyrics] Plugin loaded");
