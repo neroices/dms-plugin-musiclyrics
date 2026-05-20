@@ -924,10 +924,12 @@ PluginComponent {
     Component {
         id: hPillComponent
         Row {
+            id: pillRow
             spacing: Theme.spacingS
 
             // Simple pill containing only the context icon
             Rectangle {
+                id: iconPill
                 width: chipContent.implicitWidth + Theme.spacingS * 2
                 height: Theme.fontSizeSmall + Theme.spacingXS
                 radius: 12
@@ -948,14 +950,74 @@ PluginComponent {
                 }
             }
 
-            // Lyric Text — Fixed cropping by removing the restrictive 'width: Math.min(implicitWidth, 300)'
-            StyledText {
-                text: root.currentLyricText
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
+            // Lyric / Idle Title Container
+            Item {
+                id: textContainer
+                width: Math.min(lyricText.implicitWidth, 300)
+                height: Theme.fontSizeSmall + Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
-                maximumLineCount: 1
-                elide: Text.ElideRight
+                clip: true
+
+                StyledText {
+                    id: lyricText
+                    text: root.currentLyricText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    // Disable eliding so the full string can render and scroll
+                    elide: Text.ElideNone
+                    maximumLineCount: 1
+
+                    // Reset X position if text fits normally
+                    x: isLongText ? marqueeAnimation.currentX : 0
+
+                    // Helper property to determine if scrolling is actually needed
+                    readonly property bool isLongText: implicitWidth > textContainer.width
+
+                    // Reset animation safely when the text changes
+                    onTextChanged: {
+                        marqueeAnimation.stop()
+                        if (isLongText) {
+                            marqueeAnimation.start()
+                        }
+                    }
+                }
+
+                // Marquee Animation loop
+                SequentialAnimation {
+                    id: marqueeAnimation
+                    loops: Animation.Infinite
+                    running: lyricText.isLongText
+
+                    // Expose an internal property to safely update the text coordinate
+                    property real currentX: 0
+
+                    // Pause briefly at the start before scrolling
+                    PauseAnimation { duration: 2000 }
+
+                    // Scroll to the left
+                    NumberAnimation {
+                        target: marqueeAnimation
+                        property: "currentX"
+                        from: 0
+                        to: -(lyricText.implicitWidth - textContainer.width)
+                        // Dynamic duration based on length to keep a constant speed
+                        duration: Math.max(2000, (lyricText.implicitWidth - textContainer.width) * 30)
+                        easing.type: Easing.Linear
+                    }
+
+                    // Pause briefly at the end position
+                    PauseAnimation { duration: 2000 }
+
+                    // Quick jump or snap back to start
+                    NumberAnimation {
+                        target: marqueeAnimation
+                        property: "currentX"
+                        to: 0
+                        duration: 0
+                    }
+                }
             }
         }
     }
