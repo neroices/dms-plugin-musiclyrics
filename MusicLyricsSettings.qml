@@ -94,4 +94,33 @@ PluginSettings {
             }
         }
     }
+
+    StyledRect {
+        width: parent.width
+        height: browserColumn.implicitHeight + Theme.spacingL * 2
+        radius: Theme.cornerRadius
+        color: Theme.surfaceContainerHigh
+
+        Column {
+            id: browserColumn
+            anchors.fill: parent
+            anchors.margins: Theme.spacingL
+            spacing: Theme.spacingM
+
+            StyledText {
+                text: "Ignored Apps"
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+            }
+
+            StringSetting {
+                settingKey: "ignoredPlayers"
+                label: "Ignored MPRIS Players / Browsers"
+                description: "Comma-separated keywords. Any player matching identity, DBus name, or desktop entry will be ignored. Example: firefox, zen, chromium, chrome"
+                placeholder: "firefox,zen,chromium,chrome"
+                defaultValue: "firefox,zen,chromium,chrome,brave,edge"
+            }
+        }
+    }
 }
