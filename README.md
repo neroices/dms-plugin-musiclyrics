@@ -1,17 +1,13 @@
 # Music Lyrics (Fork)
 
-![](screenshots/1.png)
-
-<p align="center">
-<img src="screenshots/2.png" alt="screenshot 2" />
-</p>
+![](screenshots/ss.png)
     
 A DankMaterialShell widget plugin that displays synced music lyrics from multiple sources right on your panel.
 
 ## Features
 * **Live Lyrics:** Shows real-time synced lyrics on the panel bar.
 * **Smart Fetching:** Retrieves lyrics from your local cache, Navidrome, Musixmatch, or lrclib.net.
-* **Media Player Management:** Click the widget to open a popout menu where you can view lyric fetch statuses and switch between active MPRIS media players.
+* **Media Player Management:** Click the widget to open a popout menu where you can view lyric fetch statuses and switch between active MPRIS media players. Also you can control the media player from the popout menu like play/pause, next/previous track, and volume control.
 * **Application Filtering:** Block specific applications from displaying lyrics on the panel bar.
 
 ## Installation
